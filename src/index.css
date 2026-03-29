@@ -30,8 +30,8 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 20 50% 12% / 0.10;
-    --input: 20 50% 12% / 0.10;
+    --border: 20 50% 12%;
+    --input: 20 50% 12%;
     --ring: 36 53% 50%;
 
     --radius: 0px;

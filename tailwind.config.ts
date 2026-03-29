@@ -14,8 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Playfair Display", "serif"],
-        body: ["Raleway", "sans-serif"],
+        display: ["Cormorant Garamond", "serif"],
+        body: ["Jost", "sans-serif"],
+        arabic: ["Cairo", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -55,6 +56,8 @@ export default {
         chocolate: "hsl(var(--chocolate))",
         cream: "hsl(var(--cream))",
         "warm-beige": "hsl(var(--warm-beige))",
+        "mid-tone": "hsl(var(--mid-tone))",
+        "light-fill": "hsl(var(--light-fill))",
       },
       borderRadius: {
         lg: "var(--radius)",

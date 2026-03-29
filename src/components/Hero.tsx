@@ -6,7 +6,7 @@ import chocolateHero from "@/assets/chocolate-hero.png";
 const anim = (delay: number) => ({
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, ease: "easeOut", delay: delay / 1000 },
+  transition: { duration: 0.6, ease: "easeOut" as const, delay: delay / 1000 },
 });
 
 const Hero = () => {

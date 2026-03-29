@@ -3,9 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import Hero from "@/components/Hero";
-import chocolateHero from "@/assets/chocolate-hero.png";
-import giftBox from "@/assets/gift-box.png";
-import chocolatesBoxes from "@/assets/chocolates-boxes.jpg";
+import { products } from "@/data/products";
 import { useLang } from "@/hooks/use-lang";
 
 const fadeUp = {
@@ -19,6 +17,13 @@ const fadeUp = {
 
 const Index = () => {
   const { t } = useLang();
+
+  const categoryLabel = (category: string) =>
+    category === "Pralines"
+      ? t("Pralines", "برالين")
+      : category === "Gift Boxes"
+        ? t("Gift Boxes", "علب هدايا")
+        : t("Assortments", "تشكيلات");
 
   return (
     <div className="min-h-screen">
@@ -62,30 +67,28 @@ const Index = () => {
         <div className="container mx-auto px-6">
           <SectionHeading title={t("Featured Creations", "إبداعات مميزة")} subtitle={t("Discover our most beloved chocolates.", "اكتشف أكثر شوكولاتاتنا المحبوبة.")} />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              { img: chocolateHero, name: t("Hazelnut Dome", "قبة البندق"), cat: t("Pralines", "برالين") },
-              { img: giftBox, name: t("Gold Collection", "المجموعة الذهبية"), cat: t("Gift Boxes", "علب هدايا") },
-              { img: chocolatesBoxes, name: t("Signature Assortment", "التشكيلة المميزة"), cat: t("Assortments", "تشكيلات") },
-            ].map((item, i) => (
+            {products.slice(0, 3).map((item, i) => (
               <motion.div
-                key={item.name}
+                key={item.id}
                 custom={i}
                 variants={fadeUp}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
               >
-                <Link to="/products" className="group block">
+                <Link to={`/products/${item.id}`} className="group block">
                   <div className="aspect-square overflow-hidden bg-light-fill">
                     <img
-                      src={item.img}
-                      alt={item.name}
+                      src={item.image}
+                      alt={t(item.name, item.nameAr)}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                   </div>
                   <div className="mt-4 text-center">
-                    <p className="font-body text-xs tracking-[0.2em] uppercase text-muted-foreground">{item.cat}</p>
-                    <h3 className="font-display text-lg text-foreground mt-1">{item.name}</h3>
+                    <p className="font-body text-xs tracking-[0.2em] uppercase text-muted-foreground">
+                      {categoryLabel(item.category)}
+                    </p>
+                    <h3 className="font-display text-lg text-foreground mt-1">{t(item.name, item.nameAr)}</h3>
                   </div>
                 </Link>
               </motion.div>

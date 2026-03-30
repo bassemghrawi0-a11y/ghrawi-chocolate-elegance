@@ -41,10 +41,8 @@ const Philosophy = () => {
             </p>
 
             <h2 className="font-display text-[36px] md:text-[42px] font-light leading-[1.15] text-foreground mb-6">
-              {t(
-                <>What makes <em>real</em> chocolate different?</>,
-                "ما الذي يجعل الشوكولاتة الحقيقية مختلفة؟"
-              )}
+              {t("What makes ", "ما الذي يجعل الشوكولاتة الحقيقية مختلفة؟")}
+              {!useLangCtx?.isAr && <><em>real</em>{" chocolate different?"}</>}
             </h2>
 
             <p

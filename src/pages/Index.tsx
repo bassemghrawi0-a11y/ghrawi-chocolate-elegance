@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import Hero from "@/components/Hero";
+import Philosophy from "@/components/Philosophy";
 import Collections from "@/components/Collections";
 import { useLang } from "@/hooks/use-lang";
 
@@ -28,6 +29,7 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <Hero />
+      <Philosophy />
 
       {/* Promise Section */}
       <section className="py-24 bg-cream">

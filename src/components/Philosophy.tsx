@@ -25,7 +25,7 @@ const CrossIcon = () => (
 );
 
 const Philosophy = () => {
-  const { t } = useLang();
+  const { t, isAr } = useLang();
 
   return (
     <section className="bg-background">
@@ -41,8 +41,7 @@ const Philosophy = () => {
             </p>
 
             <h2 className="font-display text-[36px] md:text-[42px] font-light leading-[1.15] text-foreground mb-6">
-              {t("What makes ", "ما الذي يجعل الشوكولاتة الحقيقية مختلفة؟")}
-              {!useLangCtx?.isAr && <><em>real</em>{" chocolate different?"}</>}
+              {isAr ? "ما الذي يجعل الشوكولاتة الحقيقية مختلفة؟" : <>What makes <em>real</em> chocolate different?</>}
             </h2>
 
             <p

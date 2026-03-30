@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import Hero from "@/components/Hero";
-import { products } from "@/data/products";
+import Collections from "@/components/Collections";
 import { useLang } from "@/hooks/use-lang";
 
 const fadeUp = {
@@ -62,40 +62,8 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Featured Products */}
-      <section className="py-24 bg-background">
-        <div className="container mx-auto px-6">
-          <SectionHeading title={t("Featured Creations", "إبداعات مميزة")} subtitle={t("Discover our most beloved chocolates.", "اكتشف أكثر شوكولاتاتنا المحبوبة.")} />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {products.slice(0, 3).map((item, i) => (
-              <motion.div
-                key={item.id}
-                custom={i}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-              >
-                <Link to={`/products/${item.id}`} className="group block">
-                  <div className="aspect-square overflow-hidden bg-light-fill">
-                    <img
-                      src={item.image}
-                      alt={t(item.name, item.nameAr)}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                  </div>
-                  <div className="mt-4 text-center">
-                    <p className="font-body text-xs tracking-[0.2em] uppercase text-muted-foreground">
-                      {categoryLabel(item.category)}
-                    </p>
-                    <h3 className="font-display text-lg text-foreground mt-1">{t(item.name, item.nameAr)}</h3>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Collections */}
+      <Collections />
 
       {/* CTA */}
       <section className="py-24 bg-chocolate text-center">

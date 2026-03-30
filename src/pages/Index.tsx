@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import Hero from "@/components/Hero";
-import { products } from "@/data/products";
+import Collections from "@/components/Collections";
 import { useLang } from "@/hooks/use-lang";
 
 const fadeUp = {

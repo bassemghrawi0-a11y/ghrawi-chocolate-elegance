@@ -6,7 +6,7 @@ import SectionHeading from "@/components/SectionHeading";
 const reveal = (delayMs = 0) => ({
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
-  transition: { delay: delayMs / 1000, duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+  transition: { delay: delayMs / 1000, duration: 0.65, ease: [0.22, 1, 0.36, 1] as const },
 });
 
 const Contact = () => {

@@ -8,23 +8,16 @@ import Collections from "@/components/Collections";
 import { useLang } from "@/hooks/use-lang";
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.15, duration: 0.6 },
+    transition: { delay: i * 0.12, duration: 0.65, ease: [0.22, 1, 0.36, 1] as const },
   }),
 };
 
 const Index = () => {
   const { t } = useLang();
-
-  const categoryLabel = (category: string) =>
-    category === "Pralines"
-      ? t("Pralines", "برالين")
-      : category === "Gift Boxes"
-        ? t("Gift Boxes", "علب هدايا")
-        : t("Assortments", "تشكيلات");
 
   return (
     <div className="min-h-screen">
@@ -32,8 +25,8 @@ const Index = () => {
       <Philosophy />
 
       {/* Promise Section */}
-      <section className="py-24 bg-cream">
-        <div className="container mx-auto px-6">
+      <section className="py-section-y bg-cream">
+        <div className="container mx-auto px-section-x-mobile md:px-section-x">
           <SectionHeading
             title={t("Our Promise", "وعدنا")}
             subtitle={t(
@@ -41,7 +34,7 @@ const Index = () => {
               "كل قطعة من شوكولاتة باسم غراوي هي شهادة على التزامنا الراسخ بالجودة والأصالة."
             )}
           />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-col-gap max-w-4xl mx-auto">
             {[
               { title: t("Pure Cocoa Butter", "زبدة كاكاو نقية"), desc: t("100% pure cocoa butter in every creation. No compromises, no substitutes.", "١٠٠٪ زبدة كاكاو نقية في كل قطعة. بلا تنازلات، بلا بدائل.") },
               { title: t("No Hydrogenated Oils", "بدون زيوت مهدرجة"), desc: t("We never use hydrogenated oils. Only natural, premium ingredients.", "لا نستخدم الزيوت المهدرجة أبداً. فقط مكونات طبيعية فاخرة.") },
@@ -53,11 +46,11 @@ const Index = () => {
                 variants={fadeUp}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true }}
+                viewport={{ once: true, margin: "-60px" }}
                 className="text-center"
               >
-                <h3 className="font-display text-xl text-foreground mb-3">{item.title}</h3>
-                <p className="font-body text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                <h3 className="font-display text-[24px] font-normal text-foreground mb-3">{item.title}</h3>
+                <p className="font-body text-sm font-light text-text-muted-warm leading-[1.85]">{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -67,29 +60,35 @@ const Index = () => {
       {/* Collections */}
       <Collections />
 
-      {/* CTA */}
-      <section className="py-24 bg-chocolate text-center">
-        <div className="container mx-auto px-6">
+      {/* CTA — dark section (only one on page) */}
+      <section className="py-section-y bg-foreground text-center">
+        <div className="container mx-auto px-section-x-mobile md:px-section-x">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="font-body text-sm tracking-[0.3em] uppercase text-gold mb-4">
+            <p className="font-body text-[10px] font-normal tracking-[0.28em] uppercase text-accent mb-4">
               {t("Experience Luxury", "عش الفخامة")}
             </p>
-            <h2 className="font-display text-3xl md:text-5xl text-primary-foreground font-medium">
+            <h2 className="font-display text-[38px] md:text-[44px] font-light text-primary-foreground leading-[1.12]">
               {t("Indulge in Perfection", "انغمس في الكمال")}
             </h2>
-            <p className="mt-4 font-body text-primary-foreground/50 max-w-lg mx-auto">
+            <p className="mt-4 font-body text-sm font-light text-primary-foreground/40 max-w-lg mx-auto leading-[1.85]">
               {t("From our hands to yours — every chocolate is a work of art.", "من أيدينا إلى أيديكم — كل قطعة شوكولاتة هي عمل فني.")}
             </p>
             <Link
               to="/contact"
-              className="mt-10 inline-flex items-center gap-3 px-8 py-4 border border-fine border-gold text-gold font-body text-sm tracking-[0.2em] uppercase hover:bg-gold hover:text-accent-foreground transition-colors duration-300"
+              className="mt-10 group relative inline-flex overflow-hidden border-fine border border-accent text-accent font-body text-[11px] font-medium tracking-[0.22em] uppercase transition-colors duration-400"
             >
-              {t("Get in Touch", "تواصل معنا")} <ArrowRight size={16} />
+              <span
+                className="absolute inset-0 origin-left bg-accent scale-x-0 transition-transform duration-500 ease-[cubic-bezier(0.33,1,0.68,1)] group-hover:scale-x-100"
+                aria-hidden
+              />
+              <span className="relative z-[1] px-8 py-3.5 transition-colors duration-400 group-hover:text-accent-foreground flex items-center gap-3">
+                {t("Get in Touch", "تواصل معنا")} <ArrowRight size={14} />
+              </span>
             </Link>
           </motion.div>
         </div>

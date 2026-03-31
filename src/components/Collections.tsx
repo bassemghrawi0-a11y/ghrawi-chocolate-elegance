@@ -51,24 +51,24 @@ function getPrice(p: Product, t: (en: string, ar: string) => string): string {
 /* ── animation variants ── */
 
 const fadeSlideUp = {
-  initial: { opacity: 0, y: 24 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } },
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } },
   exit: { opacity: 0, y: -16, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } },
 };
 
 const staggerContainer = {
-  animate: { transition: { staggerChildren: 0.08 } },
+  animate: { transition: { staggerChildren: 0.12 } },
 };
 
 /* ── sub-components ── */
 
 const ImagePlaceholder = ({ className }: { className?: string }) => (
   <div className={`w-full h-full bg-light-fill flex items-center justify-center ${className || ""}`}>
-    <span className="font-body text-xs italic text-mid-tone">Product Photo</span>
+    <span className="font-body text-[11px] font-light tracking-[0.15em] text-text-hint">Product Photo</span>
   </div>
 );
 
-const ProductImage = ({
+const ProductImg = ({
   src,
   alt,
   className,
@@ -88,13 +88,12 @@ const SkeletonPulse = ({ className }: { className?: string }) => (
 );
 
 const LoadingSkeleton = () => (
-  <div className="border-t" style={{ borderColor: "rgba(44,26,14,0.1)" }}>
-    {/* Featured skeleton */}
+  <div className="border-t border-fine border-foreground/10">
     <div className="grid grid-cols-1 md:grid-cols-5">
       <div className="md:col-span-3">
         <SkeletonPulse className="w-full h-[320px] md:h-[420px] bg-light-fill" />
       </div>
-      <div className="md:col-span-2 p-10 md:p-12 space-y-5" style={{ borderLeft: "0.5px solid rgba(44,26,14,0.1)" }}>
+      <div className="md:col-span-2 p-10 md:p-12 space-y-5 border-l border-fine border-foreground/10">
         <SkeletonPulse className="w-16 h-2 bg-muted" />
         <SkeletonPulse className="w-48 h-7 bg-muted" />
         <SkeletonPulse className="w-full h-2 bg-muted" />
@@ -106,12 +105,11 @@ const LoadingSkeleton = () => (
         </div>
       </div>
     </div>
-    {/* Grid skeleton */}
-    <div className="grid grid-cols-1 md:grid-cols-3" style={{ borderTop: "0.5px solid rgba(44,26,14,0.1)" }}>
+    <div className="grid grid-cols-1 md:grid-cols-3 border-t border-fine border-foreground/10">
       {[0, 1, 2].map((i) => (
-        <div key={i} style={i > 0 ? { borderLeft: "0.5px solid rgba(44,26,14,0.1)" } : {}}>
+        <div key={i} className={i > 0 ? "border-l border-fine border-foreground/10" : ""}>
           <SkeletonPulse className="w-full h-[280px] bg-light-fill" />
-          <div className="p-6 space-y-3">
+          <div className="p-internal space-y-3">
             <SkeletonPulse className="w-14 h-2 bg-muted" />
             <SkeletonPulse className="w-32 h-5 bg-muted" />
             <SkeletonPulse className="w-full h-2 bg-muted" />
@@ -144,7 +142,7 @@ const CategoryTabs = ({
           key={cat.en}
           onClick={() => onSelect(cat.en)}
           className="relative pb-2 font-body text-[10px] font-medium tracking-[0.2em] uppercase transition-colors duration-300"
-          style={{ color: isActive ? "hsl(var(--foreground))" : "hsl(var(--mid-tone))" }}
+          style={{ color: isActive ? "hsl(var(--foreground))" : "hsl(var(--text-hint))" }}
         >
           {t(cat.en, cat.ar)}
           {isActive && (
@@ -166,33 +164,29 @@ const FeaturedCard = ({ product, t }: { product: Product; t: (en: string, ar: st
   <motion.div variants={fadeSlideUp} initial="initial" animate="animate" exit="exit" key={product.id + "-featured"}>
     <Link
       to={`/products/${product.id}`}
-      className="group grid grid-cols-1 md:grid-cols-5"
-      style={{ borderTop: "0.5px solid rgba(44,26,14,0.1)" }}
+      className="group grid grid-cols-1 md:grid-cols-5 border-t border-fine border-foreground/10"
     >
       <div className="md:col-span-3 h-[320px] md:h-[420px] overflow-hidden relative">
-        <ProductImage
+        <ProductImg
           src={getImage(product)}
           alt={t(product.name_en, product.name_ar || product.name_en)}
-          className="group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+          className="group-hover:scale-[1.03] transition-transform duration-500 ease-out"
         />
-        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left" />
       </div>
-      <div
-        className="md:col-span-2 p-10 md:py-12 md:px-10 flex flex-col justify-center"
-        style={{ borderLeft: "0.5px solid rgba(44,26,14,0.1)" }}
-      >
-        <p className="font-body text-[10px] tracking-[0.25em] uppercase text-mid-tone mb-4">
+      <div className="md:col-span-2 py-section-y px-10 flex flex-col justify-center border-l border-fine border-foreground/10">
+        <p className="font-body text-[10px] font-normal tracking-[0.28em] uppercase text-text-hint mb-4">
           {t(product.category_en || "", product.category_ar || product.category_en || "")}
         </p>
-        <h3 className="font-display text-[32px] font-light text-foreground leading-tight mb-4 group-hover:-translate-y-1 transition-transform duration-500">
+        <h3 className="font-display text-[32px] font-light text-foreground leading-tight mb-4 group-hover:-translate-y-1 transition-transform duration-400">
           {t(product.name_en, product.name_ar || product.name_en)}
         </h3>
-        <p className="font-body font-light text-[13px] text-muted-foreground leading-[1.8] max-w-[280px] mb-8">
+        <p className="font-body font-light text-[13px] text-text-muted-warm leading-[1.85] max-w-[280px] mb-8">
           {t(product.description_en || "", product.description_ar || product.description_en || "")}
         </p>
         <div className="flex items-center justify-between mt-auto">
           <span className="font-display text-lg text-foreground">{getPrice(product, t)}</span>
-          <span className="font-body text-[10px] tracking-[0.15em] uppercase text-mid-tone group-hover:text-foreground transition-colors duration-300 flex items-center gap-1.5">
+          <span className="font-body text-[10px] tracking-[0.15em] uppercase text-text-hint group-hover:text-foreground transition-colors duration-300 flex items-center gap-1.5">
             {t("Explore", "استكشف")} <ArrowRight size={12} />
           </span>
         </div>
@@ -216,31 +210,30 @@ const ProductCard = ({
     variants={fadeSlideUp}
     layout
     key={product.id}
-    style={!isFirst ? { borderLeft: "0.5px solid rgba(44,26,14,0.1)" } : {}}
-    className="border-t md:border-t-0"
+    className={`border-t md:border-t-0 ${!isFirst ? "border-l border-fine border-foreground/10" : ""}`}
   >
     <Link to={`/products/${product.id}`} className="group block">
       <div className="h-[280px] overflow-hidden relative">
-        <ProductImage
+        <ProductImg
           src={getImage(product)}
           alt={t(product.name_en, product.name_ar || product.name_en)}
-          className="group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+          className="group-hover:scale-[1.03] transition-transform duration-500 ease-out"
         />
-        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left" />
       </div>
-      <div className="p-6">
-        <p className="font-body text-[10px] tracking-[0.25em] uppercase text-mid-tone mb-2">
+      <div className="p-internal">
+        <p className="font-body text-[10px] font-normal tracking-[0.28em] uppercase text-text-hint mb-2">
           {t(product.category_en || "", product.category_ar || product.category_en || "")}
         </p>
-        <h3 className="font-display text-lg text-foreground mb-2 group-hover:-translate-y-1 transition-transform duration-500">
+        <h3 className="font-display text-lg text-foreground mb-2 group-hover:-translate-y-1 transition-transform duration-400">
           {t(product.name_en, product.name_ar || product.name_en)}
         </h3>
-        <p className="font-body font-light text-xs text-muted-foreground leading-[1.7] line-clamp-2 mb-4">
+        <p className="font-body font-light text-[13px] text-text-muted-warm leading-[1.85] line-clamp-2 mb-4">
           {t(product.description_en || "", product.description_ar || product.description_en || "")}
         </p>
         <div className="flex items-center justify-between">
           <span className="font-display text-sm text-foreground">{getPrice(product, t)}</span>
-          <span className="font-body text-[10px] tracking-[0.15em] uppercase text-mid-tone group-hover:text-foreground transition-colors duration-300 flex items-center gap-1">
+          <span className="font-body text-[10px] tracking-[0.15em] uppercase text-text-hint group-hover:text-foreground transition-colors duration-300 flex items-center gap-1">
             {t("Explore", "استكشف")} <ArrowRight size={11} />
           </span>
         </div>
@@ -272,7 +265,6 @@ const Collections = () => {
     fetchProducts();
   }, []);
 
-  /* derive categories */
   const categories = useMemo(() => {
     const cats: { en: string; ar: string }[] = [{ en: "All", ar: "الكل" }];
     const seen = new Set<string>();
@@ -285,7 +277,6 @@ const Collections = () => {
     return cats;
   }, [allProducts]);
 
-  /* filtered products */
   const filtered = useMemo(() => {
     if (activeCategory === "All") return allProducts;
     return allProducts.filter((p) => p.category_en === activeCategory);
@@ -293,31 +284,30 @@ const Collections = () => {
 
   const featured = filtered.find((p) => p.is_featured);
   const gridProducts = filtered.filter((p) => p !== featured);
-
   const isEmpty = !loading && filtered.length === 0;
 
   return (
-    <section className="py-24 bg-background">
-      <div className="container mx-auto px-6">
+    <section className="py-section-y bg-background">
+      <div className="container mx-auto px-section-x-mobile md:px-section-x">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
           className="flex items-end justify-between mb-10"
         >
           <div>
-            <p className="font-body text-[10px] tracking-[0.28em] uppercase text-mid-tone mb-3">
+            <p className="font-body text-[10px] font-normal tracking-[0.28em] uppercase text-text-hint mb-3">
               {t("Our Collections", "مجموعاتنا")}
             </p>
-            <h2 className="font-display text-[42px] font-light italic text-foreground leading-tight">
+            <h2 className="font-display text-[38px] md:text-[42px] font-light italic text-foreground leading-[1.12]">
               {t("Discover Our World", "اكتشف عالمنا")}
             </h2>
           </div>
           <Link
             to="/products"
-            className="hidden md:inline-flex items-center gap-2 font-body text-xs tracking-[0.18em] uppercase text-accent hover:text-foreground transition-colors duration-300"
+            className="hidden md:inline-flex items-center gap-2 font-body text-[11px] font-normal tracking-[0.18em] uppercase text-accent hover:text-foreground transition-colors duration-300"
           >
             {t("View All", "عرض الكل")} <ArrowRight size={14} />
           </Link>
@@ -331,7 +321,7 @@ const Collections = () => {
         {loading && <LoadingSkeleton />}
 
         {isEmpty && (
-          <p className="text-center font-body font-light italic text-sm text-mid-tone py-20">
+          <p className="text-center font-body font-light italic text-sm text-text-hint py-20">
             {t("A new creation is coming soon...", "إبداع جديد قادم قريباً...")}
           </p>
         )}
@@ -345,14 +335,10 @@ const Collections = () => {
               animate="animate"
               exit="exit"
             >
-              {/* Featured Product */}
               {featured && <FeaturedCard product={featured} t={t} />}
-
-              {/* Products Grid */}
               {gridProducts.length > 0 && (
                 <motion.div
-                  className="grid grid-cols-1 md:grid-cols-3"
-                  style={{ borderTop: "0.5px solid rgba(44,26,14,0.1)" }}
+                  className="grid grid-cols-1 md:grid-cols-3 border-t border-fine border-foreground/10"
                   variants={staggerContainer}
                 >
                   {gridProducts.map((p, i) => (
@@ -368,16 +354,21 @@ const Collections = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.65, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
           className="text-center mt-16"
         >
           <Link
             to="/products"
-            className="inline-flex items-center gap-3 px-8 py-4 font-body text-[11px] font-medium tracking-[0.22em] uppercase text-foreground hover:bg-foreground hover:text-background transition-colors duration-300"
-            style={{ border: "0.5px solid hsl(var(--foreground))" }}
+            className="group relative inline-flex overflow-hidden font-body text-[11px] font-medium tracking-[0.22em] uppercase text-foreground border-fine border border-foreground transition-colors duration-400"
           >
-            {t("View All Collections", "عرض جميع المجموعات")} <ArrowRight size={14} />
+            <span
+              className="absolute inset-0 origin-left bg-foreground scale-x-0 transition-transform duration-500 ease-[cubic-bezier(0.33,1,0.68,1)] group-hover:scale-x-100"
+              aria-hidden
+            />
+            <span className="relative z-[1] px-8 py-3.5 transition-colors duration-400 group-hover:text-background flex items-center gap-3">
+              {t("View All Collections", "عرض جميع المجموعات")} <ArrowRight size={14} />
+            </span>
           </Link>
         </motion.div>
       </div>

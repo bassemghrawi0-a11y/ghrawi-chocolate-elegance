@@ -11,8 +11,8 @@ const Products = () => {
   return (
     <div className="min-h-screen pt-20">
       {/* Header */}
-      <section className="py-20 bg-cream">
-        <div className="container mx-auto px-6">
+      <section className="py-section-y bg-cream">
+        <div className="container mx-auto px-section-x-mobile md:px-section-x">
           <SectionHeading
             title="Our Collection"
             subtitle="Each creation is a masterpiece of flavor, crafted with 100% pure cocoa butter."
@@ -24,13 +24,13 @@ const Products = () => {
               <button
                 key={cat}
                 onClick={() => setActive(cat)}
-                className={`px-6 py-2 font-body text-xs tracking-[0.2em] uppercase transition-colors border ${
+                className={`group relative overflow-hidden font-body text-[11px] font-medium tracking-[0.22em] uppercase transition-colors duration-400 ${
                   active === cat
-                    ? "bg-accent text-accent-foreground border-accent"
-                    : "bg-transparent text-muted-foreground border-border hover:border-accent hover:text-accent"
+                    ? "bg-foreground text-background border-fine border border-foreground"
+                    : "bg-transparent text-foreground border-fine border border-foreground hover:bg-foreground hover:text-background"
                 }`}
               >
-                {cat}
+                <span className="relative z-[1] px-8 py-3.5 inline-block">{cat}</span>
               </button>
             ))}
           </div>
@@ -38,28 +38,35 @@ const Products = () => {
       </section>
 
       {/* Grid */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <section className="py-section-y bg-background">
+        <div className="container mx-auto px-section-x-mobile md:px-section-x">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-comp-gap max-w-6xl mx-auto">
             {filtered.map((product, i) => (
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
+                transition={{ delay: i * 0.12, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
               >
                 <Link to={`/products/${product.id}`} className="group block">
-                  <div className="aspect-square overflow-hidden bg-warm-beige">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
+                  <div className="aspect-square overflow-hidden bg-light-fill relative">
+                    {product.image ? (
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-light-fill flex items-center justify-center">
+                        <span className="font-body text-[11px] font-light tracking-[0.15em] text-text-hint">Product Photo</span>
+                      </div>
+                    )}
+                    <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left" />
                   </div>
                   <div className="mt-4">
-                    <p className="font-body text-xs tracking-[0.2em] uppercase text-muted-foreground">{product.category}</p>
-                    <h3 className="font-display text-lg text-foreground mt-1">{product.name}</h3>
-                    <p className="font-body text-sm text-muted-foreground mt-1">{product.description}</p>
+                    <p className="font-body text-[10px] font-normal tracking-[0.28em] uppercase text-text-hint">{product.category}</p>
+                    <h3 className="font-display text-lg text-foreground mt-1 group-hover:-translate-y-1 transition-transform duration-400">{product.name}</h3>
+                    <p className="font-body text-sm font-light text-text-muted-warm mt-1 leading-[1.85]">{product.description}</p>
                   </div>
                 </Link>
               </motion.div>

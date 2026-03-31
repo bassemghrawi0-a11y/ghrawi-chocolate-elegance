@@ -6,9 +6,9 @@
 
 @layer base {
   :root {
-    /* #FAF6F0 warm ivory */
-    --background: 36 50% 96.1%;
-    --foreground: 20 50% 12%;
+    /* Core palette — all HSL */
+    --background: 36 50% 96.1%;       /* #FAF6F0 warm ivory */
+    --foreground: 20 50% 12%;         /* #2C1A0E deep cacao */
 
     --card: 34 40% 93%;
     --card-foreground: 20 50% 12%;
@@ -25,25 +25,34 @@
     --muted: 30 30% 90%;
     --muted-foreground: 20 40% 30%;
 
-    --accent: 36 53% 50%;
+    --accent: 36 53% 50%;             /* #C4943E gold */
     --accent-foreground: 34 47% 96%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 20 50% 12%;
+    --border: 20 50% 12% / 0.1;
+    --border-mid: 20 50% 12% / 0.2;
     --input: 20 50% 12%;
     --ring: 36 53% 50%;
 
     --radius: 0px;
 
+    /* Semantic aliases */
+    --text: 20 50% 12%;
+    --text-muted: 20 36% 39%;         /* #6B4226 */
+    --text-hint: 20 36% 39%;          /* #8B5E3C mid-tone */
+    --bg: 36 50% 96.1%;
+    --bg-dark: 20 50% 12%;
+    --bg-warm: 34 33% 91%;            /* #F0E8D8 */
+    --light-fill: 30 42% 81%;         /* #E8D5B7 */
+    --cream: 34 47% 96%;
+
+    /* Legacy aliases for compatibility */
     --gold: 36 53% 50%;
     --chocolate: 20 50% 12%;
-    --cream: 34 47% 96%;
     --warm-beige: 30 40% 85%;
     --mid-tone: 20 36% 39%;
-    --light-fill: 30 42% 81%;
-    --text-muted-warm: 20 40% 30%;
 
     --font-display: 'Cormorant Garamond', serif;
     --font-body: 'Jost', sans-serif;
@@ -76,33 +85,6 @@
 }
 
 @layer utilities {
-  .text-gold {
-    color: hsl(36 53% 50%);
-  }
-  .bg-gold {
-    background-color: hsl(36 53% 50%);
-  }
-  .bg-chocolate {
-    background-color: hsl(20 50% 12%);
-  }
-  .text-chocolate {
-    color: hsl(20 50% 12%);
-  }
-  .bg-cream {
-    background-color: hsl(34 47% 96%);
-  }
-  .bg-warm-beige {
-    background-color: hsl(30 40% 85%);
-  }
-  .text-mid-tone {
-    color: hsl(20 36% 39%);
-  }
-  .bg-light-fill {
-    background-color: hsl(30 42% 81%);
-  }
-  .border-gold {
-    border-color: hsl(36 53% 50%);
-  }
   .border-fine {
     border-width: 0.5px;
   }

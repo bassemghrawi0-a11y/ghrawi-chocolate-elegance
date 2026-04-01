@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import SectionHeading from "@/components/SectionHeading";
 import { products, categories } from "@/data/products";
-
+import AddToCartButton from "@/components/AddToCartButton";
+import { useLang } from "@/hooks/use-lang";
 const Products = () => {
   const [active, setActive] = useState("All");
   const filtered = active === "All" ? products : products.filter((p) => p.category === active);

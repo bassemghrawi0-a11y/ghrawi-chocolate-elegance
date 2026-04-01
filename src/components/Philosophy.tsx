@@ -30,7 +30,7 @@ const Philosophy = () => {
   return (
     <section className="bg-background">
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 min-h-[600px] py-[10px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 min-h-[600px] my-[10px] py-0">
           {/* Left — Text */}
           <motion.div {...fadeUp(0)} className="py-16 md:py-20 md:pr-14 md:pl-10 flex flex-col justify-center">
             <p

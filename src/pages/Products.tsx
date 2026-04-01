@@ -72,9 +72,9 @@ const Products = () => {
                     <AddToCartButton
                       productId={product.id}
                       name_en={product.name}
-                      name_ar={product.name}
+                      name_ar={product.nameAr || product.name}
                       image_url={product.image || null}
-                      price={product.price}
+                      price={0}
                     />
                   </div>
                 </Link>

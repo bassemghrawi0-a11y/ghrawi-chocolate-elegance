@@ -20,45 +20,64 @@ interface Product {
   name_ar: string | null;
   description_en: string | null;
   description_ar: string | null;
+  category_id: string | null;
   category_en: string | null;
   category_ar: string | null;
   image_url: string | null;
   price: number;
   product_sizes?: ProductSize[];
+  categories?: {
+    id?: string;
+    name_en?: string;
+    name_ar?: string;
+    slug?: string;
+  } | null;
 }
 
 const Products = () => {
   const { t } = useLang();
-  const [active, setActive] = useState("All");
+  const [active, setActive] = useState("all");
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name_en: string; name_ar: string; slug: string }[]>(
+    []
+  );
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      const { data } = await supabase
-        .from("products")
-        .select(
-          "id, name_en, name_ar, description_en, description_ar, category_en, category_ar, image_url, price, product_sizes(id, size_name, size_name_ar, price)"
-        )
-        .order("created_at", { ascending: false });
+    const fetchCatalog = async () => {
+      const [{ data: categoriesData }, { data: productsData }] = await Promise.all([
+        supabase
+          .from("categories")
+          .select("id, name_en, name_ar, slug")
+          .order("name_en", { ascending: true }),
+        supabase
+          .from("products")
+          .select(
+            "id, name_en, name_ar, description_en, description_ar, category_id, category_en, category_ar, image_url, price, categories(id, name_en, name_ar, slug), product_sizes(id, size_name, size_name_ar, price)"
+          )
+          .order("created_at", { ascending: false }),
+      ]);
 
-      setProducts((data as Product[]) ?? []);
+      setCategories((categoriesData as { id: string; name_en: string; name_ar: string; slug: string }[]) ?? []);
+      setProducts((productsData as Product[]) ?? []);
     };
 
-    fetchProducts();
+    fetchCatalog();
   }, []);
 
-  const categories = useMemo(() => {
-    const base = ["All"];
-    const unique = new Set<string>();
-    products.forEach((product) => {
-      if (product.category_en) unique.add(product.category_en);
-    });
-    return [...base, ...Array.from(unique)];
-  }, [products]);
+  const categoryTabs = useMemo(
+    () => [{ id: "all", name_en: "All", name_ar: "الكل", slug: "all" }, ...categories],
+    [categories]
+  );
 
   const filtered = useMemo(
     () =>
-      active === "All" ? products : products.filter((product) => (product.category_en ?? "") === active),
+      active === "all"
+        ? products
+        : products.filter((product) => {
+            const slug = product.categories?.slug;
+            if (slug) return slug === active;
+            return false;
+          }),
     [active, products]
   );
 
@@ -74,17 +93,19 @@ const Products = () => {
 
           {/* Filters */}
           <div className="flex flex-wrap justify-center gap-4">
-            {categories.map((cat) => (
+            {categoryTabs.map((cat) => (
               <button
-                key={cat}
-                onClick={() => setActive(cat)}
+                key={cat.id}
+                onClick={() => setActive(cat.slug)}
                 className={`group relative overflow-hidden font-body text-[11px] font-medium tracking-[0.22em] uppercase transition-colors duration-400 ${
-                  active === cat
+                  active === cat.slug
                     ? "bg-foreground text-background border-fine border border-foreground"
                     : "bg-transparent text-foreground border-fine border border-foreground hover:bg-foreground hover:text-background"
                 }`}
               >
-                <span className="relative z-[1] px-8 py-3.5 inline-block">{cat}</span>
+                <span className="relative z-[1] px-8 py-3.5 inline-block">
+                  {t(cat.name_en, cat.name_ar)}
+                </span>
               </button>
             ))}
           </div>
@@ -119,7 +140,10 @@ const Products = () => {
                   </div>
                   <div className="mt-4">
                     <p className="font-body text-[10px] font-normal tracking-[0.28em] uppercase text-text-hint">
-                      {t(product.category_en || "", product.category_ar || product.category_en || "")}
+                      {t(
+                        product.categories?.name_en || product.category_en || "",
+                        product.categories?.name_ar || product.category_ar || product.category_en || ""
+                      )}
                     </p>
                     <h3 className="font-display text-lg text-foreground mt-1 group-hover:-translate-y-1 transition-transform duration-400">
                       {t(product.name_en, product.name_ar || product.name_en)}

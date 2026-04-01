@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useLang } from "@/hooks/use-lang";
+import photo1 from "@/assets/photo1.jpg";
 
 const ease = [0.22, 1, 0.36, 1] as [number, number, number, number];
 const fadeUp = (delay: number) => ({
@@ -103,10 +104,12 @@ const Philosophy = () => {
           >
             {/* Image placeholder */}
             <motion.div {...fadeUp(0.15)}>
-              <div className="w-full h-[240px] flex items-center justify-center" style={{ background: "#E8D5B7" }}>
-                <span className="font-body text-[11px] tracking-[0.15em] italic" style={{ color: "#8B5E3C" }}>
-                  Process / Ingredients Photo
-                </span>
+              <div className="relative w-full h-[240px] overflow-hidden">
+                <img
+                  src={photo1}
+                  alt={t("Process and ingredients photo", "صورة العملية والمكونات")}
+                  className="w-full h-full object-cover"
+                />
               </div>
             </motion.div>
 

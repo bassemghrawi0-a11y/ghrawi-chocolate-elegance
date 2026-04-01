@@ -6,6 +6,7 @@ import { products, categories } from "@/data/products";
 import AddToCartButton from "@/components/AddToCartButton";
 import { useLang } from "@/hooks/use-lang";
 const Products = () => {
+  const { t } = useLang();
   const [active, setActive] = useState("All");
   const filtered = active === "All" ? products : products.filter((p) => p.category === active);
 

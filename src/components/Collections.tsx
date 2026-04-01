@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLang } from "@/hooks/use-lang";
+import AddToCartButton from "@/components/AddToCartButton";
 
 interface ProductSize {
   size_name: string;

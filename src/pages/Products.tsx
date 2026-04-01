@@ -1,14 +1,66 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
-import { products, categories } from "@/data/products";
 import AddToCartButton from "@/components/AddToCartButton";
 import { useLang } from "@/hooks/use-lang";
+import { supabase } from "@/integrations/supabase/client";
+
+interface ProductSize {
+  id: string;
+  size_name: string;
+  size_name_ar: string;
+  price: number;
+}
+
+interface Product {
+  id: string;
+  name_en: string;
+  name_ar: string | null;
+  description_en: string | null;
+  description_ar: string | null;
+  category_en: string | null;
+  category_ar: string | null;
+  image_url: string | null;
+  price: number;
+  product_sizes?: ProductSize[];
+}
+
 const Products = () => {
   const { t } = useLang();
   const [active, setActive] = useState("All");
-  const filtered = active === "All" ? products : products.filter((p) => p.category === active);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const { data } = await supabase
+        .from("products")
+        .select(
+          "id, name_en, name_ar, description_en, description_ar, category_en, category_ar, image_url, price, product_sizes(id, size_name, size_name_ar, price)"
+        )
+        .order("created_at", { ascending: false });
+
+      setProducts((data as Product[]) ?? []);
+    };
+
+    fetchProducts();
+  }, []);
+
+  const categories = useMemo(() => {
+    const base = ["All"];
+    const unique = new Set<string>();
+    products.forEach((product) => {
+      if (product.category_en) unique.add(product.category_en);
+    });
+    return [...base, ...Array.from(unique)];
+  }, [products]);
+
+  const filtered = useMemo(
+    () =>
+      active === "All" ? products : products.filter((product) => (product.category_en ?? "") === active),
+    [active, products]
+  );
 
   return (
     <div className="min-h-screen pt-20">
@@ -52,10 +104,10 @@ const Products = () => {
               >
                 <Link to={`/products/${product.id}`} className="group block">
                   <div className="aspect-square overflow-hidden bg-light-fill relative">
-                    {product.image ? (
+                    {product.image_url ? (
                       <img
-                        src={product.image}
-                        alt={product.name}
+                        src={product.image_url}
+                        alt={t(product.name_en, product.name_ar || product.name_en)}
                         className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out"
                       />
                     ) : (
@@ -66,15 +118,34 @@ const Products = () => {
                     <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left" />
                   </div>
                   <div className="mt-4">
-                    <p className="font-body text-[10px] font-normal tracking-[0.28em] uppercase text-text-hint">{product.category}</p>
-                    <h3 className="font-display text-lg text-foreground mt-1 group-hover:-translate-y-1 transition-transform duration-400">{product.name}</h3>
-                    <p className="font-body text-sm font-light text-text-muted-warm mt-1 leading-[1.85]">{product.description}</p>
+                    <p className="font-body text-[10px] font-normal tracking-[0.28em] uppercase text-text-hint">
+                      {t(product.category_en || "", product.category_ar || product.category_en || "")}
+                    </p>
+                    <h3 className="font-display text-lg text-foreground mt-1 group-hover:-translate-y-1 transition-transform duration-400">
+                      {t(product.name_en, product.name_ar || product.name_en)}
+                    </h3>
+                    <p className="font-body text-sm font-light text-text-muted-warm mt-1 leading-[1.85]">
+                      {t(
+                        product.description_en || "",
+                        product.description_ar || product.description_en || ""
+                      )}
+                    </p>
+                    <div className="mt-3 flex items-center justify-between">
+                      <span className="font-display text-sm text-foreground">
+                        {product.product_sizes?.length
+                          ? t(
+                              `From $${Math.min(...product.product_sizes.map((size) => size.price))}`,
+                              `من $${Math.min(...product.product_sizes.map((size) => size.price))}`
+                            )
+                          : `$${product.price}`}
+                      </span>
+                      <span className="font-body text-[10px] tracking-[0.15em] uppercase text-text-hint group-hover:text-foreground transition-colors duration-300 flex items-center gap-1">
+                        {t("Explore", "استكشف")} <ArrowRight size={11} />
+                      </span>
+                    </div>
                     <AddToCartButton
                       productId={product.id}
-                      name_en={product.name}
-                      name_ar={product.nameAr || product.name}
-                      image_url={product.image || null}
-                      price={0}
+                      productSizes={product.product_sizes}
                     />
                   </div>
                 </Link>

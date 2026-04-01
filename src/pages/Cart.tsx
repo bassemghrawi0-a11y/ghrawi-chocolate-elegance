@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLang } from "@/hooks/use-lang";
-import { useCartStore } from "@/stores/cart-store";
+import { useCart, type CartItem } from "@/hooks/use-cart";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
-
-/* ── Cart Item Row ── */
 
 const CartItemRow = ({
   item,
@@ -13,76 +11,69 @@ const CartItemRow = ({
   onUpdateQty,
   onRemove,
 }: {
-  item: ReturnType<typeof useCartStore.getState>["items"][number];
+  item: CartItem;
   t: (en: string, ar: string) => string;
-  onUpdateQty: (productId: string, sizeId: string | null, qty: number) => void;
-  onRemove: (productId: string, sizeId: string | null) => void;
+  onUpdateQty: (cartItemId: string, qty: number) => void;
+  onRemove: (cartItemId: string) => void;
 }) => (
   <div className="flex items-center gap-4 py-5 border-b border-border/50">
-    {/* Image */}
     <div className="w-20 h-20 flex-shrink-0 overflow-hidden bg-light-fill">
       {item.image_url ? (
         <img
           src={item.image_url}
-          alt={t(item.name_en, item.name_ar)}
+          alt={t(item.name_en, item.name_ar || item.name_en)}
           className="w-full h-full object-cover"
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center">
-          <span className="font-body text-[9px] text-text-hint">—</span>
+          <span className="font-body text-[9px] text-text-hint">-</span>
         </div>
       )}
     </div>
 
-    {/* Info */}
     <div className="flex-1 min-w-0">
       <p className="font-display text-base font-normal text-foreground truncate">
-        {t(item.name_en, item.name_ar)}
+        {t(item.name_en, item.name_ar || item.name_en)}
       </p>
       {item.size_name && (
         <p className="font-body text-[11px] font-light text-text-hint mt-0.5">
-          {item.size_name}
+          {t(item.size_name, item.size_name_ar || item.size_name)}
         </p>
       )}
     </div>
 
-    {/* Quantity */}
     <div className="flex items-center gap-0">
       <button
-        onClick={() => onUpdateQty(item.productId, item.size_id, item.quantity - 1)}
+        onClick={() => onUpdateQty(item.id, item.quantity - 1)}
         disabled={item.quantity <= 1}
         className="w-7 h-7 flex items-center justify-center border border-border/50 font-body text-xs text-foreground disabled:opacity-30 hover:bg-foreground hover:text-background transition-colors duration-200"
       >
-        −
+        -
       </button>
       <span className="w-7 h-7 flex items-center justify-center border-y border-border/50 font-body text-xs text-foreground">
         {item.quantity}
       </span>
       <button
-        onClick={() => onUpdateQty(item.productId, item.size_id, item.quantity + 1)}
+        onClick={() => onUpdateQty(item.id, item.quantity + 1)}
         className="w-7 h-7 flex items-center justify-center border border-border/50 font-body text-xs text-foreground hover:bg-foreground hover:text-background transition-colors duration-200"
       >
         +
       </button>
     </div>
 
-    {/* Line price */}
     <span className="font-body text-[13px] font-normal text-foreground w-16 text-right">
-      ${(item.price * item.quantity).toFixed(2)}
+      ${(item.effective_price * item.quantity).toFixed(2)}
     </span>
 
-    {/* Remove */}
     <button
-      onClick={() => onRemove(item.productId, item.size_id)}
+      onClick={() => onRemove(item.id)}
       className="font-body text-[11px] font-light text-text-hint hover:text-accent transition-colors duration-200 ml-1"
       aria-label="Remove"
     >
-      ✕
+      x
     </button>
   </div>
 );
-
-/* ── Order Summary ── */
 
 const OrderSummary = ({
   t,
@@ -92,6 +83,9 @@ const OrderSummary = ({
   discountPercent,
   discountAmount,
   isEmpty,
+  isAuthenticated,
+  onApplyDiscount,
+  onRemoveDiscount,
 }: {
   t: (en: string, ar: string) => string;
   subtotal: number;
@@ -100,16 +94,22 @@ const OrderSummary = ({
   discountPercent: number;
   discountAmount: number;
   isEmpty: boolean;
+  isAuthenticated: boolean;
+  onApplyDiscount: (code: string, percent: number, amount: number) => void;
+  onRemoveDiscount: () => void;
 }) => {
   const navigate = useNavigate();
-  const applyDiscount = useCartStore((s) => s.applyDiscount);
-  const removeDiscount = useCartStore((s) => s.removeDiscount);
   const [promoInput, setPromoInput] = useState("");
   const [promoStatus, setPromoStatus] = useState<"idle" | "success" | "error">("idle");
   const [promoMsg, setPromoMsg] = useState("");
   const [checking, setChecking] = useState(false);
 
-  const discountTotal = subtotal * (discountPercent / 100) + discountAmount;
+  const discountTotal =
+    discountPercent > 0
+      ? subtotal * (discountPercent / 100)
+      : discountAmount > 0
+        ? discountAmount
+        : 0;
 
   const handleApply = async () => {
     if (!promoInput.trim()) return;
@@ -131,7 +131,6 @@ const OrderSummary = ({
       return;
     }
 
-    // Check expiry
     if (data.expires_at && new Date(data.expires_at) <= new Date()) {
       setPromoStatus("error");
       setPromoMsg(t("Invalid or expired code", "الكود غير صحيح أو منتهي الصلاحية"));
@@ -139,7 +138,6 @@ const OrderSummary = ({
       return;
     }
 
-    // Check max uses
     if (data.max_uses !== null && data.used_count >= data.max_uses) {
       setPromoStatus("error");
       setPromoMsg(t("Invalid or expired code", "الكود غير صحيح أو منتهي الصلاحية"));
@@ -147,19 +145,20 @@ const OrderSummary = ({
       return;
     }
 
-    applyDiscount(data.code, Number(data.discount_percent), Number(data.discount_amount));
+    const percent = Number(data.discount_percent ?? 0);
+    const amount = Number(data.discount_amount ?? 0);
+
+    if (percent > 0) {
+      onApplyDiscount(data.code, percent, 0);
+    } else if (amount > 0) {
+      onApplyDiscount(data.code, 0, amount);
+    } else {
+      onApplyDiscount(data.code, 0, 0);
+    }
     setPromoStatus("success");
     setPromoMsg(t("Code applied ✓", "تم تطبيق الكود ✓"));
     setChecking(false);
   };
-
-  // Check auth for CTA
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
-  useState(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setIsLoggedIn(!!data.session);
-    });
-  });
 
   return (
     <div className="md:sticky md:top-[100px] bg-bg-warm border border-border/50 p-7">
@@ -167,7 +166,6 @@ const OrderSummary = ({
         {t("Order Summary", "ملخص الطلب")}
       </p>
 
-      {/* Lines */}
       <div className="space-y-3 font-body text-[13px]">
         <div className="flex justify-between text-foreground">
           <span>{t("Subtotal", "المجموع الفرعي")}</span>
@@ -183,14 +181,14 @@ const OrderSummary = ({
               {t("Discount", "الخصم")}
               <button
                 onClick={() => {
-                  removeDiscount();
+                  onRemoveDiscount();
                   setPromoInput("");
                   setPromoStatus("idle");
                   setPromoMsg("");
                 }}
                 className="text-[10px] text-text-hint hover:text-accent transition-colors"
               >
-                ✕
+                x
               </button>
             </span>
             <span>- ${discountTotal.toFixed(2)}</span>
@@ -198,10 +196,8 @@ const OrderSummary = ({
         )}
       </div>
 
-      {/* Divider */}
       <div className="border-t border-border/50 my-5" />
 
-      {/* Total */}
       <div className="flex items-baseline justify-between">
         <span className="font-body text-[13px] font-normal text-foreground">
           {t("Total", "الإجمالي")}
@@ -211,7 +207,6 @@ const OrderSummary = ({
         </span>
       </div>
 
-      {/* Promo code */}
       {!discountCode && (
         <div className="mt-6">
           <div className="flex gap-0">
@@ -243,11 +238,10 @@ const OrderSummary = ({
         </div>
       )}
 
-      {/* CTA */}
       <button
         onClick={() => {
           if (isEmpty) return;
-          if (!isLoggedIn) {
+          if (!isAuthenticated) {
             navigate("/auth?returnUrl=/checkout");
             return;
           }
@@ -262,7 +256,7 @@ const OrderSummary = ({
       >
         {isEmpty
           ? t("Proceed to Checkout", "إتمام الطلب")
-          : isLoggedIn === false
+          : !isAuthenticated
             ? t("Sign in to Checkout", "سجل دخولك للمتابعة")
             : t("Proceed to Checkout", "إتمام الطلب")}
       </button>
@@ -270,20 +264,33 @@ const OrderSummary = ({
   );
 };
 
-/* ── Cart Page ── */
-
 const Cart = () => {
   const { t } = useLang();
-  const items = useCartStore((s) => s.items);
-  const updateQuantity = useCartStore((s) => s.updateQuantity);
-  const removeItem = useCartStore((s) => s.removeItem);
-  const subtotal = useCartStore((s) => s.getSubtotal());
-  const total = useCartStore((s) => s.getTotal());
-  const discountCode = useCartStore((s) => s.discountCode);
-  const discountPercent = useCartStore((s) => s.discountPercent);
-  const discountAmount = useCartStore((s) => s.discountAmount);
+  const { items, updateQuantity, removeItem, subtotal, loading, isAuthenticated } = useCart();
+  const [discountCode, setDiscountCode] = useState<string | null>(null);
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [discountAmount, setDiscountAmount] = useState(0);
 
   const isEmpty = items.length === 0;
+  const effectiveDiscount =
+    discountPercent > 0
+      ? subtotal * (discountPercent / 100)
+      : discountAmount > 0
+        ? discountAmount
+        : 0;
+  const total = Math.max(0, subtotal - effectiveDiscount);
+
+  const applyDiscount = (code: string, percent: number, amount: number) => {
+    setDiscountCode(code);
+    setDiscountPercent(percent);
+    setDiscountAmount(amount);
+  };
+
+  const clearDiscount = () => {
+    setDiscountCode(null);
+    setDiscountPercent(0);
+    setDiscountAmount(0);
+  };
 
   return (
     <div className="min-h-screen pt-20 bg-background">
@@ -294,13 +301,18 @@ const Cart = () => {
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="grid grid-cols-1 md:grid-cols-[65%_35%] gap-10 md:gap-12 items-start"
         >
-          {/* LEFT — Items */}
           <div>
             <h1 className="font-display text-[32px] font-light text-foreground mb-8">
               {t("Your Cart", "سلتك")}
             </h1>
 
-            {isEmpty ? (
+            {loading ? (
+              <div className="text-center py-20">
+                <p className="font-body text-sm font-light text-text-hint">
+                  {t("Loading cart...", "جارٍ تحميل السلة...")}
+                </p>
+              </div>
+            ) : isEmpty ? (
               <div className="text-center py-20">
                 <p className="font-body text-sm font-light text-text-hint mb-4">
                   {t("Your cart is empty", "سلتك فارغة")}
@@ -316,7 +328,7 @@ const Cart = () => {
               <div>
                 {items.map((item) => (
                   <CartItemRow
-                    key={`${item.productId}-${item.size_id || "base"}`}
+                    key={item.id}
                     item={item}
                     t={t}
                     onUpdateQty={updateQuantity}
@@ -327,7 +339,6 @@ const Cart = () => {
             )}
           </div>
 
-          {/* RIGHT — Summary */}
           <OrderSummary
             t={t}
             subtotal={subtotal}
@@ -335,7 +346,10 @@ const Cart = () => {
             discountCode={discountCode}
             discountPercent={discountPercent}
             discountAmount={discountAmount}
-            isEmpty={isEmpty}
+            isEmpty={isEmpty || loading}
+            isAuthenticated={isAuthenticated}
+            onApplyDiscount={applyDiscount}
+            onRemoveDiscount={clearDiscount}
           />
         </motion.div>
       </div>

@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLang } from "@/hooks/use-lang";
-import { useCartStore } from "@/stores/cart-store";
+import { useCart } from "@/hooks/use-cart";
 
 const navLinks = [
   { to: "/products", en: "Collections", ar: "المجموعات" },
@@ -18,7 +18,7 @@ const Navbar = () => {
   const { isAr, toggleLang, t } = useLang();
   const location = useLocation();
   const navigate = useNavigate();
-  const itemCount = useCartStore((s) => s.getItemCount());
+  const { itemCount } = useCart();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -66,7 +66,8 @@ const Navbar = () => {
           </button>
           <button
             onClick={() => navigate("/cart")}
-            className="relative text-text-hint hover:text-foreground transition-colors duration-300"
+            className="relative transition-colors duration-300"
+            style={{ color: "var(--text)" }}
             aria-label="Cart"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -75,7 +76,16 @@ const Navbar = () => {
               <path d="M16 10a4 4 0 01-8 0" />
             </svg>
             {itemCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-accent flex items-center justify-center font-display text-[10px] font-medium text-white leading-none">
+              <span
+                className="absolute top-0 right-0 w-4 h-4 rounded-full bg-accent flex items-center justify-center leading-none"
+                style={{
+                  transform: "translate(35%, -35%)",
+                  fontFamily: "Jost, sans-serif",
+                  fontWeight: 500,
+                  fontSize: "10px",
+                  color: "white",
+                }}
+              >
                 {itemCount}
               </span>
             )}
@@ -129,7 +139,8 @@ const Navbar = () => {
                 </button>
                 <button
                   onClick={() => { setOpen(false); navigate("/cart"); }}
-                  className="relative text-text-hint"
+                  className="relative"
+                  style={{ color: "var(--text)" }}
                   aria-label="Cart"
                 >
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -138,7 +149,16 @@ const Navbar = () => {
                     <path d="M16 10a4 4 0 01-8 0" />
                   </svg>
                   {itemCount > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-accent flex items-center justify-center font-display text-[10px] font-medium text-white leading-none">
+                    <span
+                      className="absolute top-0 right-0 w-4 h-4 rounded-full bg-accent flex items-center justify-center leading-none"
+                      style={{
+                        transform: "translate(35%, -35%)",
+                        fontFamily: "Jost, sans-serif",
+                        fontWeight: 500,
+                        fontSize: "10px",
+                        color: "white",
+                      }}
+                    >
                       {itemCount}
                     </span>
                   )}

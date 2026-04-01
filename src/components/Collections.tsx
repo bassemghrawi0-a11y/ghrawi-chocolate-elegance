@@ -7,7 +7,9 @@ import { useLang } from "@/hooks/use-lang";
 import AddToCartButton from "@/components/AddToCartButton";
 
 interface ProductSize {
+  id: string;
   size_name: string;
+  size_name_ar: string;
   price: number;
 }
 
@@ -240,10 +242,7 @@ const ProductCard = ({
         </div>
         <AddToCartButton
           productId={product.id}
-          name_en={product.name_en}
-          name_ar={product.name_ar || product.name_en}
-          image_url={getImage(product)}
-          price={product.product_sizes?.length ? Math.min(...product.product_sizes.map(s => s.price)) : product.price}
+          productSizes={product.product_sizes}
         />
       </div>
     </Link>
@@ -263,7 +262,7 @@ const Collections = () => {
       const { data } = await supabase
         .from("products")
         .select(
-          "id, name_en, name_ar, description_en, description_ar, price, image_url, category_en, category_ar, is_featured, product_images(image_url, display_order), product_sizes(size_name, price)"
+          "id, name_en, name_ar, description_en, description_ar, price, image_url, category_en, category_ar, is_featured, product_images(image_url, display_order), product_sizes(id, size_name, size_name_ar, price)"
         )
         .order("created_at", { ascending: false });
 

@@ -98,7 +98,7 @@ const Philosophy = () => {
 
           {/* Right — Visual */}
           <div
-            className="flex flex-col justify-center gap-6 py-16 md:py-16 px-8 md:px-10"
+            className="flex flex-col justify-center gap-6 py-16 px-8 md:px-10 md:py-[50px]"
             style={{ background: "#F0E8D8", borderLeft: line }}
           >
             {/* Image placeholder */}

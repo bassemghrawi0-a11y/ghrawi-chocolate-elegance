@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLang } from "@/hooks/use-lang";
+import AddToCartButton from "@/components/AddToCartButton";
 
 interface ProductSize {
   size_name: string;
@@ -237,6 +238,13 @@ const ProductCard = ({
             {t("Explore", "استكشف")} <ArrowRight size={11} />
           </span>
         </div>
+        <AddToCartButton
+          productId={product.id}
+          name_en={product.name_en}
+          name_ar={product.name_ar || product.name_en}
+          image_url={getImage(product)}
+          price={product.product_sizes?.length ? Math.min(...product.product_sizes.map(s => s.price)) : product.price}
+        />
       </div>
     </Link>
   </motion.div>

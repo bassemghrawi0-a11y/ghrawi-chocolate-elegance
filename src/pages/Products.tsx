@@ -3,8 +3,10 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import SectionHeading from "@/components/SectionHeading";
 import { products, categories } from "@/data/products";
-
+import AddToCartButton from "@/components/AddToCartButton";
+import { useLang } from "@/hooks/use-lang";
 const Products = () => {
+  const { t } = useLang();
   const [active, setActive] = useState("All");
   const filtered = active === "All" ? products : products.filter((p) => p.category === active);
 
@@ -67,6 +69,13 @@ const Products = () => {
                     <p className="font-body text-[10px] font-normal tracking-[0.28em] uppercase text-text-hint">{product.category}</p>
                     <h3 className="font-display text-lg text-foreground mt-1 group-hover:-translate-y-1 transition-transform duration-400">{product.name}</h3>
                     <p className="font-body text-sm font-light text-text-muted-warm mt-1 leading-[1.85]">{product.description}</p>
+                    <AddToCartButton
+                      productId={product.id}
+                      name_en={product.name}
+                      name_ar={product.nameAr || product.name}
+                      image_url={product.image || null}
+                      price={0}
+                    />
                   </div>
                 </Link>
               </motion.div>

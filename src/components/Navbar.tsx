@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLang } from "@/hooks/use-lang";
+import { useCartStore } from "@/stores/cart-store";
 
 const navLinks = [
   { to: "/products", en: "Collections", ar: "المجموعات" },
@@ -16,6 +17,8 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const { isAr, toggleLang, t } = useLang();
   const location = useLocation();
+  const navigate = useNavigate();
+  const itemCount = useCartStore((s) => s.getItemCount());
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -60,6 +63,22 @@ const Navbar = () => {
             className="font-body text-[10px] font-normal tracking-[0.14em] text-text-hint border border-fine border-foreground/10 px-3 py-1.5 hover:text-foreground hover:border-foreground/20 transition-colors duration-300"
           >
             EN · AR
+          </button>
+          <button
+            onClick={() => navigate("/cart")}
+            className="relative text-text-hint hover:text-foreground transition-colors duration-300"
+            aria-label="Cart"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 01-8 0" />
+            </svg>
+            {itemCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-accent flex items-center justify-center font-display text-[10px] font-medium text-white leading-none">
+                {itemCount}
+              </span>
+            )}
           </button>
           <a
             href="https://wa.me/message"
@@ -107,6 +126,22 @@ const Navbar = () => {
                   className="font-body text-[10px] font-normal tracking-[0.14em] text-text-hint border border-fine border-foreground/10 px-3 py-1.5"
                 >
                   EN · AR
+                </button>
+                <button
+                  onClick={() => { setOpen(false); navigate("/cart"); }}
+                  className="relative text-text-hint"
+                  aria-label="Cart"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <path d="M16 10a4 4 0 01-8 0" />
+                  </svg>
+                  {itemCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-accent flex items-center justify-center font-display text-[10px] font-medium text-white leading-none">
+                      {itemCount}
+                    </span>
+                  )}
                 </button>
                 <a href="https://wa.me/message" target="_blank" rel="noreferrer" className="text-text-hint" aria-label="WhatsApp">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
